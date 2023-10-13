@@ -1,6 +1,8 @@
-### Cyclistic_Exercise_Full_Year_Analysis ###
+### Divvy_Exercise_Full_Year_Analysis ###
 
-# This analysis is for case study 1 from the Google Data Analytics Certificate (Cyclistic).  It’s originally based on the case study "'Sophisticated, Clear, and Polished’: Divvy and Data Visualization" written by Kevin Hartman (found here: https://artscience.blog/home/divvy-dataviz-case-study). We will be using the Divvy dataset for the case study. The purpose of this script is to consolidate downloaded Divvy data into a single dataframe and then conduct simple analysis to help answer the key question: “In what ways do members and casual riders use Divvy bikes differently?”
+# This analysis is for case study 1 from the Google Data Analytics Certificate. 
+# It’s originally based on the case study "'Sophisticated, Clear, and Polished’: Divvy and Data Visualization" written by Kevin Hartman (found here: https://artscience.blog/home/divvy-dataviz-case-study). 
+# We will be using the Divvy dataset for the case study. The purpose of this script is to consolidate downloaded Divvy data into a single dataframe and then conduct simple analysis to help answer the key question: “In what ways do members and casual riders use Divvy bikes differently?”
 
 # # # # # # # # # # # # # # # # # # # # # # # 
 # Install required packages
@@ -97,9 +99,8 @@ str(all_trips)  #See list of columns and data types (numeric, character, etc)
 summary(all_trips)  #Statistical summary of data. Mainly for numerics
 
 # There are a few problems we will need to fix:
-#   The data can only be aggregated at the ride-level, which is too granular. We will want to add some additional columns of data -- such as day, month, year -- that provide additional opportunities to aggregate the data.
-#   We will want to add a calculated field for length of ride since the 2020Q1 data did not have the "tripduration" column. We will add "ride_length" to the entire dataframe for consistency.
-#   There are some rides where tripduration shows up as negative, including several hundred rides where Divvy took bikes out of circulation for Quality Control reasons. We will want to delete these rides.
+# The data can only be aggregated at the ride-level, which is too granular. We will want to add some additional columns of data -- such as day, month, year -- that provide additional opportunities to aggregate the data.
+# There are some rides where tripduration shows up as negative, including several hundred rides where Divvy took bikes out of circulation for Quality Control reasons. We will want to delete these rides.
 
 
 # Add columns that list the date, month, day, and year of each ride
@@ -192,10 +193,7 @@ all_trips_v2 %>%
 #=================================================
 # STEP 5: EXPORT SUMMARY FILE FOR FURTHER ANALYSIS
 #=================================================
-# Create a csv file that we will visualize in Excel, Tableau, or my presentation software
-# N.B.: This file location is for a Mac. If you are working on a PC, change the file location accordingly (most likely "C:\Users\YOUR_USERNAME\Desktop\...") to export the data. You can read more here: https://datatofish.com/export-dataframe-to-csv-in-r/
+# You can create a csv file that we will visualize in Excel or Tableau
+
 counts <- aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
 write.csv(counts, file = 'C:/Users/Pratik Patel/Desktop/Google Capstone Project/Divy Data/2021/counts.csv')
-
-#You're done! Congratulations!
-
