@@ -15,7 +15,7 @@ library(tidyverse)  #helps wrangle data
 library(lubridate)  #helps wrangle date attributes
 library(ggplot2)  #helps visualize data
 getwd() #displays your working directory
-setwd("/Users/Pratik Patel/Desktop/Google Capstone Project/Divy Data/2021/csv")
+setwd("/Users/Pratik Patel/Desktop/Divvy_Data_Project/csv")
 
 #=====================
 # STEP 1: COLLECT DATA
@@ -40,7 +40,7 @@ Dec_21 <- read.csv("202112-divvy-tripdata.csv")
 # STEP 2: WRANGLE DATA AND COMBINE INTO A SINGLE FILE
 #====================================================
 # Compare column names each of the files
-# While the names don't have to be in the same order, they DO need to match perfectly before we can use a command to join them into one file
+# While the names don't have to be in the same order, they do need to match before we can use a command to join them into one file
 colnames(Jan_21)
 colnames(Feb_21)
 colnames(Mar_21)
@@ -84,12 +84,13 @@ Dec_21 <-  mutate(Dec_21, ride_id = as.character(ride_id)
 # Stack individual month's data frames into one big data frame
 all_trips <- bind_rows(Jan_21,Feb_21,Mar_21,Apr_21,May_21,Jun_21,Jul_21,Aug_21,Sep_21,Oct_21,Nov_21,Dec_21)
 
-# Remove lat, long,and ride_length. The reason for removing ride_length is that we will remake in R. All the durations will be in seconds
+# We will remove the columns that we do not need for this analysis. The reason for removing ride_length is that we will remake in R. All the durations will be calculated in seconds.
 all_trips <- all_trips %>%  
-  select(-c(start_lat, start_lng, end_lat, end_lng,ride_length))
+  select(-c(start_lat, start_lng, end_lat, end_lng,start_station_id,end_station_name,end_station_id,ride_length))
 #======================================================
 # STEP 3: CLEAN UP AND ADD DATA TO PREPARE FOR ANALYSIS
 #======================================================
+
 # Inspect the new table that has been created
 colnames(all_trips)  #List of column names
 nrow(all_trips)  #How many rows are in data frame?
@@ -99,15 +100,15 @@ str(all_trips)  #See list of columns and data types (numeric, character, etc)
 summary(all_trips)  #Statistical summary of data. Mainly for numerics
 
 # There are a few problems we will need to fix:
-# The data can only be aggregated at the ride-level, which is too granular. We will want to add some additional columns of data -- such as day, month, year -- that provide additional opportunities to aggregate the data.
-# There are some rides where tripduration shows up as negative, including several hundred rides where Divvy took bikes out of circulation for Quality Control reasons. We will want to delete these rides.
+# The data can only be aggregated at the ride-level, which is too granular. We will want to add some additional columns of data -- such as day, month, year. 
+# There are some rides where ride_length shows up as negative, including bikes out of circulation for Quality Control reasons. We will want to delete these rides.
 
 
 # Add columns that list the date, month, day, and year of each ride
 # This will allow us to aggregate ride data for each month, day, or year ... before completing these operations we could only aggregate at the ride level
 # https://www.statmethods.net/input/dates.html more on date formats in R found at that link
 
-all_trips$date <- as.Date(all_trips$started_at, format="%m/%d/%Y") #The default format is yyyy-mm-dd
+all_trips$date <- as.Date(all_trips$started_at, format="%m/%d/%Y")
 all_trips$month <- format(as.Date(all_trips$date), "%m")
 all_trips$day <- format(as.Date(all_trips$date), "%d")
 all_trips$year <- format(as.Date(all_trips$date), "%Y")
@@ -122,12 +123,10 @@ all_trips$ride_length <- difftime(all_trips$ended_at,all_trips$started_at)
 # Inspect the structure of the columns
 str(all_trips)
 
-
 # Convert "ride_length" from Character to numeric so we can run calculations on the data
 is.factor(all_trips$ride_length)
 all_trips$ride_length <- as.numeric(as.character(all_trips$ride_length))
 is.numeric(all_trips$ride_length)
-
 
 # Remove "bad" data
 # The dataframe includes a few hundred entries when bikes were taken out of docks and checked for quality by Divvy or ride_length was negative
@@ -139,10 +138,10 @@ all_trips_v2 <- all_trips[!(all_trips$start_station_name == "HQ QR" | all_trips$
 # STEP 4: CONDUCT DESCRIPTIVE ANALYSIS
 #=====================================
 # Descriptive analysis on ride_length (all figures in seconds)
-mean(all_trips_v2$ride_length) #straight average (total ride length / rides)
-median(all_trips_v2$ride_length) #midpoint number in the ascending array of ride lengths
-max(all_trips_v2$ride_length) #longest ride
-min(all_trips_v2$ride_length) #shortest ride
+mean(all_trips_v2$ride_length)
+median(all_trips_v2$ride_length)
+max(all_trips_v2$ride_length)
+min(all_trips_v2$ride_length)
 
 # You can condense the four lines above to one line using summary() on the specific attribute
 summary(all_trips_v2$ride_length)
@@ -196,4 +195,9 @@ all_trips_v2 %>%
 # You can create a csv file that we will visualize in Excel or Tableau
 
 counts <- aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
-write.csv(counts, file = 'C:/Users/Pratik Patel/Desktop/Google Capstone Project/Divy Data/2021/counts.csv')
+write.csv(counts, file = 'C:/Users/Pratik Patel/Desktop/Divvy_Data_Project/counts.csv')
+
+#We will use this file to create visuals
+write.csv(all_trips_v2, file = 'C:/Users/Pratik Patel/Desktop/Divvy_Data_Project/all_trips.csv')
+
+
